@@ -1,0 +1,30 @@
+# 🏙️ FinanceFlow USA
+
+**FinanceFlow USA** is a Python-based economic analytics dashboard built with **PyQt5**, **Pandas**, and **Matplotlib**.  
+It visualizes investment growth, project completion, and job creation trends across all 50 U.S. states.
+
+---
+
+## 🚀 Features
+- Interactive **PyQt5 GUI Dashboard**
+- Import & visualize **investment data (CSV)**
+- Track **project progress and completion**
+- Generate **ROI and funding analysis**
+- Display **nationwide map view** with Folium
+- Export **reports as CSV or PDF**
+
+---
+
+## 🧱 Tech Stack
+| Layer | Technology |
+|-------|-------------|
+| GUI | PyQt5, QtWebEngine |
+| Data Analysis | Pandas, NumPy |
+| Visualization | Matplotlib, Seaborn, Folium |
+| Database | SQLite |
+| Reporting | fpdf2 |
+| APIs | Census, BEA, FRED (optional) |
+
+---
+
+## 📂 Folder Structure
