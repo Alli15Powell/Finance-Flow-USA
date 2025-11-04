@@ -6,7 +6,24 @@ from PyQt5.QtCore import Qt
 import geopandas as gpd
 import pandas as pd
 import sqlite3
+import os
 from us import states
+
+def load_county_data():
+    """Load and cache US counties locally to avoid freezing."""
+    cache_path = "data/us_counties.geojson"
+
+    # If cached file exists, use it
+    if os.path.exists(cache_path):
+        return gpd.read_file(cache_path)
+
+    # Otherwise download once and save
+    print("Downloading county shapefile... (first run only)")
+    url = "https://www2.census.gov/geo/tiger/TIGER2023/COUNTY/tl_2023_us_county.zip"
+    df = gpd.read_file(url)
+    df.to_file(cache_path, driver="GeoJSON")
+    print("Saved cached county file to:", cache_path)
+    return df
 
 class InvestmentsTab(QWidget):
     def __init__(self):
