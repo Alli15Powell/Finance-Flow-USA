@@ -1,0 +1,9 @@
+PyQt5
+PyQtWebEngine
+pandas
+matplotlib
+seaborn
+folium
+geopandas
+requests
+fpdf2
