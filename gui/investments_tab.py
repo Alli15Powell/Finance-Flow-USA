@@ -109,7 +109,12 @@ class InvestmentsTab(QWidget):
     def on_county_data_loaded(self, df):
         """Store loaded county data once the thread finishes."""
         self.county_data = df
-        print("✅ County data loaded and ready for autocomplete.")
+        print("County data loaded and ready for autocomplete.")
+
+    # Refresh county suggestions for the current state
+    current_state = self.state_input.text().strip()
+    if current_state:
+        self.update_county_completer()
 
     # -------------------------------------------------
     # 🔍 Update County Suggestions
