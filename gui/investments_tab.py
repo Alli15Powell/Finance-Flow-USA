@@ -2,8 +2,11 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
     QLineEdit, QFormLayout, QMessageBox, QCompleter
 )
-import sqlite3
+from PyQt5.QtCore import Qt
+import geopandas as gpd
 import pandas as pd
+import sqlite3
+from us import states
 
 class InvestmentsTab(QWidget):
     def __init__(self):
