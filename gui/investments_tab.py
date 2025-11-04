@@ -13,7 +13,6 @@ class InvestmentsTab(QWidget):
         super().__init__()
         self.layout = QVBoxLayout()
 
-        # --- Title ---
         self.layout.addWidget(QLabel("Add New Investment Record"))
 
         # --- Form fields ---
@@ -35,45 +34,58 @@ class InvestmentsTab(QWidget):
         form_layout.addRow("Jobs Created:", self.jobs_input)
         form_layout.addRow("Start Year:", self.start_input)
         form_layout.addRow("End Year:", self.end_input)
+
         self.layout.addLayout(form_layout)
 
-        # --- Autocomplete datasets ---
-        states = [
-            "Alabama","Alaska","Arizona","Arkansas","California","Colorado",
-            "Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois",
-            "Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
-            "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana",
-            "Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York",
-            "North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
-            "Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah",
-            "Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
-        ]
-        industries = [
-            "Agriculture","Construction","Education","Energy","Finance","Healthcare",
-            "Infrastructure","Manufacturing","Research","Retail","Technology","Tourism",
-            "Transportation","Renewable Energy"
-        ]
-        counties = [
-            "Jefferson","Mobile","Madison","Montgomery","Los Angeles","Orange",
-            "Travis","Kings","Cook","Harris"
-        ]
+        # --- State completer ---
+        all_states = [s.name for s in states.STATES]
+        self.state_completer = QCompleter(all_states)
+        self.state_completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.state_input.setCompleter(self.state_completer)
 
-        state_completer = QCompleter(states)
-        industry_completer = QCompleter(industries)
-        county_completer = QCompleter(counties)
+        # --- Empty county completer initially ---
+        self.county_completer = QCompleter([])
+        self.county_completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.county_input.setCompleter(self.county_completer)
 
-        self.state_input.setCompleter(state_completer)
-        self.industry_input.setCompleter(industry_completer)
-        self.county_input.setCompleter(county_completer)
+        # --- When state changes, load counties dynamically ---
+        self.state_input.textChanged.connect(self.update_county_completer)
 
-        # --- Submit button ---
+        # --- Save button ---
         self.save_btn = QPushButton("Save Record")
         self.save_btn.clicked.connect(self.add_to_database)
         self.layout.addWidget(self.save_btn)
 
         self.setLayout(self.layout)
 
+    def update_county_completer(self):
+        """Load official county names dynamically for the selected state."""
+        state_name = self.state_input.text().strip()
+        st = states.lookup(state_name)
+        if not st:
+            self.county_completer = QCompleter([])
+            self.county_input.setCompleter(self.county_completer)
+            return
+
+        try:
+            # Download or read the US counties shapefile (Census TIGER)
+            url = "https://www2.census.gov/geo/tiger/TIGER2023/COUNTY/tl_2023_us_county.zip"
+            df = gpd.read_file(url)
+
+            # Filter by selected state FIPS
+            state_counties = df[df["STATEFP"] == st.fips]["NAME"].tolist()
+            state_counties.sort()
+
+            # Update county completer dynamically
+            self.county_completer = QCompleter(state_counties)
+            self.county_completer.setCaseSensitivity(Qt.CaseInsensitive)
+            self.county_input.setCompleter(self.county_completer)
+
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to load counties: {e}")
+
     def add_to_database(self):
+        """Save new investment entry."""
         try:
             data = (
                 self.state_input.text(),
