@@ -8,6 +8,7 @@ import pandas as pd
 import sqlite3
 import os
 from us import states
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
 def load_county_data():
     """Load and cache US counties locally to avoid freezing."""
@@ -24,6 +25,17 @@ def load_county_data():
     df.to_file(cache_path, driver="GeoJSON")
     print("Saved cached county file to:", cache_path)
     return df
+
+class CountyLoader(QThread):
+    loaded = pyqtSignal(object)  # emits the dataframe once loaded
+
+    def run(self):
+        try:
+            df = load_county_data()
+            self.loaded.emit(df)
+        except Exception as e:
+            print("Error loading counties:", e)
+            self.loaded.emit(None)
 
 class InvestmentsTab(QWidget):
     def __init__(self):
@@ -74,6 +86,17 @@ class InvestmentsTab(QWidget):
         self.layout.addWidget(self.save_btn)
 
         self.setLayout(self.layout)
+
+        # Start background county loader
+        self.county_data = None
+        self.loader = CountyLoader()
+        self.loader.loaded.connect(self.on_county_data_loaded)
+        self.loader.start()
+
+def on_county_data_loaded(self, df):
+    """Store loaded county data once the thread finishes."""
+    self.county_data = df
+    print("County data loaded and ready for autocomplete.")
 
     def update_county_completer(self):
         """Load official county names dynamically for the selected state."""
