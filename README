@@ -1,0 +1,123 @@
+# FinanceFlow USA
+
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![PyQt5](https://img.shields.io/badge/PyQt5-GUI-orange)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+FinanceFlow USA is a Python-based economic analytics dashboard built with PyQt5, Pandas, and Matplotlib.  
+It visualizes investment growth, project completion, and job creation trends across all 50 U.S. states, providing a clear overview of funding efficiency and development performance.
+
+---
+
+## Features
+- Interactive PyQt5 GUI dashboard
+- Import and visualize investment data from CSV files
+- Store information in a local SQLite database
+- Generate ROI (funding per job) analytics
+- Display nationwide map using Folium
+- Includes database creation and seeding scripts
+- (Future) Export reports as CSV or PDF files
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-------------|
+| GUI | PyQt5, QtWebEngine |
+| Data Analysis | Pandas, NumPy |
+| Visualization | Matplotlib, Seaborn, Folium |
+| Database | SQLite |
+| Reporting | fpdf2 |
+| APIs (future) | Census, BEA, FRED |
+
+---
+
+## Folder Structure
+
+FinanceFlow-USA/
+├── main.py
+├── requirements.txt
+├── README.md
+│
+├── core/
+│ ├── db.py # Creates database and tables
+│ ├── seed_db.py # Inserts sample data
+│ └── check_db.py # Verifies database contents
+│
+├── gui/
+│ ├── investments_tab.py
+│ ├── analytics_tab.py
+│ └── map_tab.py
+│
+├── data/
+│ ├── financeflow.db
+│ └── sample_investments.csv
+│
+├── assets/
+│ ├── styles.qss
+│ └── dashboard_preview.png
+│
+└── reports/
+
+
+---
+
+## Setup and Usage
+
+### Step 1: Clone the repository
+```bash
+git clone https://github.com/Alli15Powell/FinanceFlow-USA.git
+cd FinanceFlow-USA
+
+
+Step 2: Create and activate a virtual environment (recommended)
+
+Windows
+
+python -m venv venv
+venv\Scripts\activate
+
+
+Mac/Linux
+
+python3 -m venv venv
+source venv/bin/activate
+
+Step 3: Install dependencies
+pip install -r requirements.txt
+
+Step 4: Initialize the database
+python core/db.py
+python core/seed_db.py
+
+Step 5: Run the application
+python main.py
+
+Reset Instructions
+
+If your charts show no data or you encounter the error
+pandas.errors.DatabaseError: file is not a database,
+you can reset and rebuild the database using the following commands:
+
+del data\financeflow.db          # Windows
+# or
+rm data/financeflow.db           # Mac/Linux
+
+python core/db.py                # Recreate the database
+python core/seed_db.py           # Reseed with example data
+
+
+Then relaunch the app:
+
+python main.py
+
+Example Dashboard
+
+License
+
+MIT License © 2025 Allison Powell
+
+Contributing
+
+Contributions are welcome. Please open an issue or submit a pull request for proposed changes or enhancements.
