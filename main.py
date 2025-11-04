@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
 from gui.investments_tab import InvestmentsTab
+self.tabs.addTab(InvestmentsTab(), "Investments")
 from gui.analytics_tab import AnalyticsTab
 from gui.map_tab import MapTab
-from gui.investments_tab import InvestmentsTab
-self.tabs.addTab(InvestmentsTab(), "Investments")
 import sys
 
 class FinanceFlowMain(QMainWindow):
