@@ -1,11 +1,11 @@
-# 🏙️ FinanceFlow USA
+# FinanceFlow USA
 
 **FinanceFlow USA** is a Python-based economic analytics dashboard built with **PyQt5**, **Pandas**, and **Matplotlib**.  
 It visualizes investment growth, project completion, and job creation trends across all 50 U.S. states.
 
 ---
 
-## 🚀 Features
+## Features
 - Interactive **PyQt5 GUI Dashboard**
 - Import & visualize **investment data (CSV)**
 - Track **project progress and completion**
@@ -15,7 +15,7 @@ It visualizes investment growth, project completion, and job creation trends acr
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 | Layer | Technology |
 |-------|-------------|
 | GUI | PyQt5, QtWebEngine |
@@ -27,4 +27,4 @@ It visualizes investment growth, project completion, and job creation trends acr
 
 ---
 
-## 📂 Folder Structure
+## Folder Structure
