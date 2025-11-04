@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
-    QFileDialog, QLineEdit, QHBoxLayout, QMessageBox, QFormLayout
+    QFileDialog, QLineEdit, QFormLayout, QMessageBox, QCompleter
 )
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
