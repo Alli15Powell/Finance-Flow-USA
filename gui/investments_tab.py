@@ -2,14 +2,16 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
     QLineEdit, QFormLayout, QMessageBox, QCompleter
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 import geopandas as gpd
 import pandas as pd
 import sqlite3
 import os
 from us import states
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
+# -------------------------------------------------
+# 🧭 CACHED COUNTY DATA LOADER
+# -------------------------------------------------
 def load_county_data():
     """Load and cache US counties locally to avoid freezing."""
     cache_path = "data/us_counties.geojson"
@@ -26,6 +28,10 @@ def load_county_data():
     print("Saved cached county file to:", cache_path)
     return df
 
+
+# -------------------------------------------------
+# 🧵 Background Thread for County Loading
+# -------------------------------------------------
 class CountyLoader(QThread):
     loaded = pyqtSignal(object)  # emits the dataframe once loaded
 
@@ -37,6 +43,10 @@ class CountyLoader(QThread):
             print("Error loading counties:", e)
             self.loaded.emit(None)
 
+
+# -------------------------------------------------
+# 🧱 Main Investments Tab
+# -------------------------------------------------
 class InvestmentsTab(QWidget):
     def __init__(self):
         super().__init__()
@@ -93,13 +103,25 @@ class InvestmentsTab(QWidget):
         self.loader.loaded.connect(self.on_county_data_loaded)
         self.loader.start()
 
-def on_county_data_loaded(self, df):
-    """Store loaded county data once the thread finishes."""
-    self.county_data = df
-    print("County data loaded and ready for autocomplete.")
+    # -------------------------------------------------
+    # 📥 Background Loader Callback
+    # -------------------------------------------------
+    def on_county_data_loaded(self, df):
+        """Store loaded county data once the thread finishes."""
+        self.county_data = df
+        print("✅ County data loaded and ready for autocomplete.")
 
+    # -------------------------------------------------
+    # 🔍 Update County Suggestions
+    # -------------------------------------------------
     def update_county_completer(self):
         """Load official county names dynamically for the selected state."""
+        if self.county_data is None:
+            # Data not loaded yet
+            self.county_completer = QCompleter([])
+            self.county_input.setCompleter(self.county_completer)
+            return
+
         state_name = self.state_input.text().strip()
         st = states.lookup(state_name)
         if not st:
@@ -108,15 +130,9 @@ def on_county_data_loaded(self, df):
             return
 
         try:
-            # Download or read the US counties shapefile (Census TIGER)
-            url = "https://www2.census.gov/geo/tiger/TIGER2023/COUNTY/tl_2023_us_county.zip"
-            df = gpd.read_file(url)
-
-            # Filter by selected state FIPS
-            state_counties = df[df["STATEFP"] == st.fips]["NAME"].tolist()
+            state_counties = self.county_data[self.county_data["STATEFP"] == st.fips]["NAME"].tolist()
             state_counties.sort()
 
-            # Update county completer dynamically
             self.county_completer = QCompleter(state_counties)
             self.county_completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.county_input.setCompleter(self.county_completer)
@@ -124,6 +140,9 @@ def on_county_data_loaded(self, df):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to load counties: {e}")
 
+    # -------------------------------------------------
+    # 💾 Save to Database
+    # -------------------------------------------------
     def add_to_database(self):
         """Save new investment entry."""
         try:
@@ -148,6 +167,7 @@ def on_county_data_loaded(self, df):
             conn.close()
 
             QMessageBox.information(self, "Success", "Investment added successfully!")
+
             for field in [self.state_input, self.county_input, self.project_input,
                           self.industry_input, self.funding_input, self.jobs_input,
                           self.start_input, self.end_input]:
